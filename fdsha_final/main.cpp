@@ -2,6 +2,9 @@
 #include <iostream>
 #include <limits>
 #include <cctype>
+#include <string>
+
+using namespace FDSHA;
 
 // Helper function to handle input validation
 void safeInput(double& value, const std::string& prompt) {
@@ -14,18 +17,32 @@ void safeInput(double& value, const std::string& prompt) {
     }
 }
 
+// provide a qualitative verdict based on the crisp PGA value
+std::string getPGAVerdict(double pga) {
+    if (pga < 0.10) {
+        return "Negligible (Very Low Hazard)";
+    } else if (pga < 0.25) {
+        return "Low (Minor Structural Risk)";
+    } else if (pga < 0.45) {
+        return "Moderate (Significant Damage Likely)";
+    } else if (pga < 0.65) {
+        return "High (Major Structural Damage Expected)";
+    } else if (pga < 0.80) {
+        return "Very High (Severe Damage, Near Collapse)";
+    } else {
+        return "Extreme (Maximum Hazard, Catastrophic Damage)";
+    }
+}
+
 int main() {
-    using namespace FDSHA;
 
     std::cout << " Fuzzy Deterministic Seismic Hazard Analysis (FDSHA)  " << std::endl;
     FDSHAEngine engine;
-
     char continue_choice;
 
     do {
         // --- 1. Get User Inputs ---
         double Mmax_Input, R_Input, F_Input;
-
         // Prompt for Maximum Magnitude (Mmax)
         safeInput(Mmax_Input, "Enter Maximum Magnitude (Mmax, typically 4.5 to 8.5): ");
 
@@ -37,6 +54,7 @@ int main() {
 
         // --- 2. Run the Fuzzy Inference System ---
         double PGA_Output = engine.findPGA(Mmax_Input, R_Input, F_Input);
+        std::string verdict = getPGAVerdict(PGA_Output); // Get the qualitative verdict
 
         // --- 3. Display Results ---
         std::cout << "\n--- ANALYSIS RESULT ---" << std::endl;
@@ -47,6 +65,7 @@ int main() {
 
         std::cout << "\nCalculated Peak Ground Acceleration (PGA): "
                   << PGA_Output << " g" << std::endl;
+        std::cout << "Final Hazard Verdict: " << verdict << std::endl;
         std::cout << "-----------------------" << std::endl;
 
         // --- 4. Prompt to continue ---
@@ -64,6 +83,6 @@ int main() {
 
     } while (continue_choice == 'y');
 
-    std::cout << "\nProgram ended. Thank you for using the FDSHA Analysis Tool." << std::endl;
+    std::cout << "\nProgram ended." << std::endl;
     return 0;
 }
