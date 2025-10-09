@@ -13,7 +13,7 @@ namespace FDSHA {
         MagnitudeTerm Mmax;
         DistanceTerm R;
         FaultTypeTerm F;
-        PGATerm PGA; // Consequent
+        PGATerm PGA;
 
         FuzzyRule(MagnitudeTerm m, DistanceTerm r, FaultTypeTerm f, PGATerm p)
             : Mmax(m), R(r), F(f), PGA(p) {}
