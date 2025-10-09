@@ -1,10 +1,12 @@
-#ifndef FUZZYSET_H
-#define FUZZYSET_H
-
+#ifndef FUZZYSET_H_INCLUDED
+#define FUZZYSET_H_INCLUDED
 #include <string>
 
 namespace FDSHA {
 
+    /**
+     * @brief Abstract base class for a Fuzzy Set and its Membership Function.
+     */
     class FuzzySet {
     public:
         std::string Name;
@@ -12,6 +14,9 @@ namespace FDSHA {
         virtual ~FuzzySet() = default;
     };
 
+    /**
+     * @brief Implementation for a Triangular Membership Function.
+     */
     class TriangularFuzzySet : public FuzzySet {
     private:
         double a, b, c;
@@ -21,7 +26,9 @@ namespace FDSHA {
         double getMembershipDegree(double x) const override;
     };
 
-
+    /**
+     * @brief Implementation for a Trapezoidal Membership Function.
+     */
     class TrapezoidalFuzzySet : public FuzzySet {
     private:
         double a, b, c, d;
@@ -33,4 +40,4 @@ namespace FDSHA {
 
 } // namespace FDSHA
 
-#endif // FUZZYSET_H
+#endif // FUZZYSET_H_INCLUDED

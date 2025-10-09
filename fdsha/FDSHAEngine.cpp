@@ -1,11 +1,98 @@
-// File: FDSHAEngine.cpp
-
 #include "FDSHAEngine.h"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <sstream>
 
 namespace FDSHA {
+
+    // ====================================================================
+    // 🛠️ MISSING I: CONCRETE FUZZY SET IMPLEMENTATIONS
+    // ====================================================================
+
+    class TriangularFuzzySet : public FuzzySet {
+    private:
+        double a, b, c;
+
+    public:
+        // Constructor definition (must match header declaration)
+        TriangularFuzzySet(std::string name, double a_val, double b_val, double c_val) : a(a_val), b(b_val), c(c_val) {
+            Name = name;
+        }
+
+        double getMembershipDegree(double x) const override {
+            if (x <= a || x >= c) return 0.0;
+            if (x == b) return 1.0;
+            if (x > a && x < b) return (x - a) / (b - a);
+            if (x > b && x < c) return (c - x) / (c - b);
+            return 0.0;
+        }
+    };
+
+    class TrapezoidalFuzzySet : public FuzzySet {
+    private:
+        double a, b, c, d;
+
+    public:
+        // Constructor definition (must match header declaration)
+        TrapezoidalFuzzySet(std::string name, double a_val, double b_val, double c_val, double d_val) : a(a_val), b(b_val), c(c_val), d(d_val) {
+            Name = name;
+        }
+
+        double getMembershipDegree(double x) const override {
+            if (x <= a || x >= d) return 0.0;
+            if (x >= b && x <= c) return 1.0;
+            if (x > a && x < b) return (x - a) / (b - a); // Rising slope
+            if (x > c && x < d) return (d - x) / (d - c); // Falling slope
+            return 0.0;
+        }
+    };
+
+    // ====================================================================
+    // 🛠️ MISSING II: ENUM TO STRING HELPERS
+    // ====================================================================
+
+    std::string FDSHAEngine::enumToString(MagnitudeTerm t) const {
+        switch (t) {
+            case MagnitudeTerm::Short: return "Short";
+            case MagnitudeTerm::Medium: return "Medium";
+            case MagnitudeTerm::Large: return "Large";
+            case MagnitudeTerm::VeryLarge: return "VeryLarge";
+            case MagnitudeTerm::VeryVeryLarge: return "VeryVeryLarge";
+            default: return "";
+        }
+    }
+
+    std::string FDSHAEngine::enumToString(DistanceTerm t) const {
+        switch (t) {
+            case DistanceTerm::Near: return "Near";
+            case DistanceTerm::Medium: return "Medium";
+            case DistanceTerm::Far: return "Far";
+            case DistanceTerm::VeryFar: return "VeryFar";
+            default: return "";
+        }
+    }
+
+    std::string FDSHAEngine::enumToString(FaultTypeTerm t) const {
+        switch (t) {
+            case FaultTypeTerm::Normal: return "Normal";
+            case FaultTypeTerm::Oblique: return "Oblique";
+            case FaultTypeTerm::Thrust: return "Thrust";
+            default: return "";
+        }
+    }
+
+    std::string FDSHAEngine::enumToString(PGATerm t) const {
+        switch (t) {
+            case PGATerm::VeryLow: return "VeryLow";
+            case PGATerm::Low: return "Low";
+            case PGATerm::Medium: return "Medium";
+            case PGATerm::Much: return "Much";
+            case PGATerm::VeryMuch: return "VeryMuch";
+            case PGATerm::VeryVeryMuch: return "VeryVeryMuch";
+            default: return "";
+        }
+    }
 
     // --- Constructor and Destructor ---
     FDSHAEngine::FDSHAEngine() {
@@ -20,10 +107,6 @@ namespace FDSHA {
         for (auto const& [key, val] : FSets) delete val;
         for (auto const& [key, val] : PGASets) delete val;
     }
-
-    // --- Helper Functions (Implementation of Enum-to-String) ---
-    // (Implementation for all four enumToString functions as provided in the single file solution)
-    // ...
 
     // --- Initialization (Implementation of Fuzzy Sets) ---
     void FDSHAEngine::initializeFuzzySets() {
@@ -54,88 +137,93 @@ namespace FDSHA {
         PGASets["VeryVeryMuch"] = new TrapezoidalFuzzySet("VeryVeryMuch", 0.75, 0.85, 0.9, 0.9);
     }
 
-     void FDSHAEngine::initializeRules() {
-        // IF Fault Type (F) is NORMAL
-        // R is Near (N):
+    // ====================================================================
+    // 🛠️ MISSING III: COMPLETE RULE BASE (60 RULES)
+    // ====================================================================
+    void FDSHAEngine::initializeRules() {
+        // Total: 60 Rules (3 Fault Types * 4 Distances * 5 Magnitudes)
+
+        // I. IF Fault Type (F) is NORMAL
+        // R is Near (N)
         Rules.emplace_back(MagnitudeTerm::Short, DistanceTerm::Near, FaultTypeTerm::Normal, PGATerm::Low);
         Rules.emplace_back(MagnitudeTerm::Medium, DistanceTerm::Near, FaultTypeTerm::Normal, PGATerm::Medium);
         Rules.emplace_back(MagnitudeTerm::Large, DistanceTerm::Near, FaultTypeTerm::Normal, PGATerm::Much);
         Rules.emplace_back(MagnitudeTerm::VeryLarge, DistanceTerm::Near, FaultTypeTerm::Normal, PGATerm::VeryMuch);
         Rules.emplace_back(MagnitudeTerm::VeryVeryLarge, DistanceTerm::Near, FaultTypeTerm::Normal, PGATerm::VeryMuch);
 
-        // R is Medium (M):
+        // R is Medium (M)
         Rules.emplace_back(MagnitudeTerm::Short, DistanceTerm::Medium, FaultTypeTerm::Normal, PGATerm::VeryLow);
         Rules.emplace_back(MagnitudeTerm::Medium, DistanceTerm::Medium, FaultTypeTerm::Normal, PGATerm::Low);
         Rules.emplace_back(MagnitudeTerm::Large, DistanceTerm::Medium, FaultTypeTerm::Normal, PGATerm::Medium);
         Rules.emplace_back(MagnitudeTerm::VeryLarge, DistanceTerm::Medium, FaultTypeTerm::Normal, PGATerm::Much);
         Rules.emplace_back(MagnitudeTerm::VeryVeryLarge, DistanceTerm::Medium, FaultTypeTerm::Normal, PGATerm::VeryMuch);
 
-        // R is Far (F):
+        // R is Far (F)
         Rules.emplace_back(MagnitudeTerm::Short, DistanceTerm::Far, FaultTypeTerm::Normal, PGATerm::VeryLow);
         Rules.emplace_back(MagnitudeTerm::Medium, DistanceTerm::Far, FaultTypeTerm::Normal, PGATerm::VeryLow);
         Rules.emplace_back(MagnitudeTerm::Large, DistanceTerm::Far, FaultTypeTerm::Normal, PGATerm::Low);
         Rules.emplace_back(MagnitudeTerm::VeryLarge, DistanceTerm::Far, FaultTypeTerm::Normal, PGATerm::Medium);
         Rules.emplace_back(MagnitudeTerm::VeryVeryLarge, DistanceTerm::Far, FaultTypeTerm::Normal, PGATerm::Much);
 
-        // R is Very Far (VF):
+        // R is Very Far (VF)
         Rules.emplace_back(MagnitudeTerm::Short, DistanceTerm::VeryFar, FaultTypeTerm::Normal, PGATerm::VeryLow);
         Rules.emplace_back(MagnitudeTerm::Medium, DistanceTerm::VeryFar, FaultTypeTerm::Normal, PGATerm::VeryLow);
         Rules.emplace_back(MagnitudeTerm::Large, DistanceTerm::VeryFar, FaultTypeTerm::Normal, PGATerm::VeryLow);
         Rules.emplace_back(MagnitudeTerm::VeryLarge, DistanceTerm::VeryFar, FaultTypeTerm::Normal, PGATerm::Low);
         Rules.emplace_back(MagnitudeTerm::VeryVeryLarge, DistanceTerm::VeryFar, FaultTypeTerm::Normal, PGATerm::Medium);
 
-        // IF Fault Type (F) is OBLIQUE
-        // R is Near (N):
+        // II. IF Fault Type (F) is OBLIQUE
+        // R is Near (N)
         Rules.emplace_back(MagnitudeTerm::Short, DistanceTerm::Near, FaultTypeTerm::Oblique, PGATerm::Medium);
         Rules.emplace_back(MagnitudeTerm::Medium, DistanceTerm::Near, FaultTypeTerm::Oblique, PGATerm::Much);
         Rules.emplace_back(MagnitudeTerm::Large, DistanceTerm::Near, FaultTypeTerm::Oblique, PGATerm::VeryMuch);
         Rules.emplace_back(MagnitudeTerm::VeryLarge, DistanceTerm::Near, FaultTypeTerm::Oblique, PGATerm::VeryMuch);
         Rules.emplace_back(MagnitudeTerm::VeryVeryLarge, DistanceTerm::Near, FaultTypeTerm::Oblique, PGATerm::VeryVeryMuch);
 
-        // R is Medium (M):
+        // R is Medium (M)
         Rules.emplace_back(MagnitudeTerm::Short, DistanceTerm::Medium, FaultTypeTerm::Oblique, PGATerm::Low);
         Rules.emplace_back(MagnitudeTerm::Medium, DistanceTerm::Medium, FaultTypeTerm::Oblique, PGATerm::Medium);
         Rules.emplace_back(MagnitudeTerm::Large, DistanceTerm::Medium, FaultTypeTerm::Oblique, PGATerm::Much);
         Rules.emplace_back(MagnitudeTerm::VeryLarge, DistanceTerm::Medium, FaultTypeTerm::Oblique, PGATerm::VeryMuch);
         Rules.emplace_back(MagnitudeTerm::VeryVeryLarge, DistanceTerm::Medium, FaultTypeTerm::Oblique, PGATerm::VeryMuch);
 
-        // R is Far (F):
+        // R is Far (F)
         Rules.emplace_back(MagnitudeTerm::Short, DistanceTerm::Far, FaultTypeTerm::Oblique, PGATerm::VeryLow);
         Rules.emplace_back(MagnitudeTerm::Medium, DistanceTerm::Far, FaultTypeTerm::Oblique, PGATerm::Low);
         Rules.emplace_back(MagnitudeTerm::Large, DistanceTerm::Far, FaultTypeTerm::Oblique, PGATerm::Medium);
         Rules.emplace_back(MagnitudeTerm::VeryLarge, DistanceTerm::Far, FaultTypeTerm::Oblique, PGATerm::Much);
         Rules.emplace_back(MagnitudeTerm::VeryVeryLarge, DistanceTerm::Far, FaultTypeTerm::Oblique, PGATerm::VeryMuch);
 
-        // R is Very Far (VF):
+        // R is Very Far (VF)
         Rules.emplace_back(MagnitudeTerm::Short, DistanceTerm::VeryFar, FaultTypeTerm::Oblique, PGATerm::VeryLow);
         Rules.emplace_back(MagnitudeTerm::Medium, DistanceTerm::VeryFar, FaultTypeTerm::Oblique, PGATerm::VeryLow);
         Rules.emplace_back(MagnitudeTerm::Large, DistanceTerm::VeryFar, FaultTypeTerm::Oblique, PGATerm::Low);
         Rules.emplace_back(MagnitudeTerm::VeryLarge, DistanceTerm::VeryFar, FaultTypeTerm::Oblique, PGATerm::Medium);
         Rules.emplace_back(MagnitudeTerm::VeryVeryLarge, DistanceTerm::VeryFar, FaultTypeTerm::Oblique, PGATerm::Much);
 
-        // IF Fault Type (F) is THRUST
-        // R is Near (N):
+        // III. IF Fault Type (F) is THRUST
+        // R is Near (N)
         Rules.emplace_back(MagnitudeTerm::Short, DistanceTerm::Near, FaultTypeTerm::Thrust, PGATerm::Much);
         Rules.emplace_back(MagnitudeTerm::Medium, DistanceTerm::Near, FaultTypeTerm::Thrust, PGATerm::VeryMuch);
         Rules.emplace_back(MagnitudeTerm::Large, DistanceTerm::Near, FaultTypeTerm::Thrust, PGATerm::VeryVeryMuch);
         Rules.emplace_back(MagnitudeTerm::VeryLarge, DistanceTerm::Near, FaultTypeTerm::Thrust, PGATerm::VeryVeryMuch);
         Rules.emplace_back(MagnitudeTerm::VeryVeryLarge, DistanceTerm::Near, FaultTypeTerm::Thrust, PGATerm::VeryVeryMuch);
 
-        // R is Medium (M):
+        // R is Medium (M)
         Rules.emplace_back(MagnitudeTerm::Short, DistanceTerm::Medium, FaultTypeTerm::Thrust, PGATerm::Medium);
         Rules.emplace_back(MagnitudeTerm::Medium, DistanceTerm::Medium, FaultTypeTerm::Thrust, PGATerm::Much);
         Rules.emplace_back(MagnitudeTerm::Large, DistanceTerm::Medium, FaultTypeTerm::Thrust, PGATerm::VeryMuch);
         Rules.emplace_back(MagnitudeTerm::VeryLarge, DistanceTerm::Medium, FaultTypeTerm::Thrust, PGATerm::VeryMuch);
         Rules.emplace_back(MagnitudeTerm::VeryVeryLarge, DistanceTerm::Medium, FaultTypeTerm::Thrust, PGATerm::VeryVeryMuch);
 
-        // R is Far (F):
+        // R is Far (F)
         Rules.emplace_back(MagnitudeTerm::Short, DistanceTerm::Far, FaultTypeTerm::Thrust, PGATerm::Low);
         Rules.emplace_back(MagnitudeTerm::Medium, DistanceTerm::Far, FaultTypeTerm::Thrust, PGATerm::Medium);
         Rules.emplace_back(MagnitudeTerm::Large, DistanceTerm::Far, FaultTypeTerm::Thrust, PGATerm::Much);
         Rules.emplace_back(MagnitudeTerm::VeryLarge, DistanceTerm::Far, FaultTypeTerm::Thrust, PGATerm::VeryMuch);
         Rules.emplace_back(MagnitudeTerm::VeryVeryLarge, DistanceTerm::Far, FaultTypeTerm::Thrust, PGATerm::VeryMuch);
 
-        // R is Very Far (VF):
+        // R is Very Far (VF)
         Rules.emplace_back(MagnitudeTerm::Short, DistanceTerm::VeryFar, FaultTypeTerm::Thrust, PGATerm::VeryLow);
         Rules.emplace_back(MagnitudeTerm::Medium, DistanceTerm::VeryFar, FaultTypeTerm::Thrust, PGATerm::Low);
         Rules.emplace_back(MagnitudeTerm::Large, DistanceTerm::VeryFar, FaultTypeTerm::Thrust, PGATerm::Medium);
@@ -150,7 +238,7 @@ namespace FDSHA {
         const double PGA_MAX = 0.9;
         const int NUM_POINTS = 1000;
         const double STEP_SIZE = (PGA_MAX - PGA_MIN) / NUM_POINTS;
-        
+
         double numerator = 0.0;
         double denominator = 0.0;
 
@@ -177,10 +265,10 @@ namespace FDSHA {
         // 1. FUZZIFICATION
         std::map<std::string, double> mmaxMemberships;
         for (auto const& [name, set] : MmaxSets) mmaxMemberships[name] = set->getMembershipDegree(mmaxInput);
-        
+
         std::map<std::string, double> rMemberships;
         for (auto const& [name, set] : RSets) rMemberships[name] = set->getMembershipDegree(rInput);
-        
+
         std::map<std::string, double> fMemberships;
         for (auto const& [name, set] : FSets) fMemberships[name] = set->getMembershipDegree(fInput);
 
@@ -193,12 +281,12 @@ namespace FDSHA {
             double rDeg = rMemberships.at(enumToString(rule.R));
             double fDeg = fMemberships.at(enumToString(rule.F));
 
-            double alpha = rule.getFiringStrength(mmaxDeg, rDeg, fDeg); 
+            double alpha = rule.getFiringStrength(mmaxDeg, rDeg, fDeg);
             PGATerm term = rule.PGA;
-            
+
             // Aggregation (MAX)
             if (aggregatedConsequents.find(term) == aggregatedConsequents.end() || alpha > aggregatedConsequents[term]) {
-                aggregatedConsequents[term] = alpha; 
+                aggregatedConsequents[term] = alpha;
             }
         }
 
