@@ -26,11 +26,11 @@ std::string getPGAVerdict(double pga) {
     } else if (pga < 0.45) {
         return "Moderate (Significant Damage Likely)";
     } else if (pga < 0.65) {
-        return "High (Major Structural Damage Expected)";
+        return "High/Much (Major Structural Damage Expected)";
     } else if (pga < 0.80) {
-        return "Very High (Severe Damage, Near Collapse)";
+        return "Very High/Very Much (Severe Damage, Near Collapse)";
     } else {
-        return "Extreme (Maximum Hazard, Catastrophic Damage)";
+        return "Extreme/Very Very Much (Maximum Hazard, Catastrophic Damage)";
     }
 }
 
