@@ -39,3 +39,10 @@
 
 # debug information files
 *.dwo
+
+bin/
+obj/
+
+*.cbp
+*.layout
+*.depend 
