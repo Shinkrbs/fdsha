@@ -1,5 +1,5 @@
-#ifndef ENUMS_H
-#define ENUMS_H
+#ifndef ENUMS_H_INCLUDED
+#define ENUMS_H_INCLUDED
 
 namespace FDSHA {
 
@@ -17,4 +17,4 @@ namespace FDSHA {
 
 } // namespace FDSHA
 
-#endif // ENUMS_H
+#endif // ENUMS_H_INCLUDED

@@ -11,7 +11,9 @@ namespace FDSHA {
     double TriangularFuzzySet::getMembershipDegree(double x) const {
         if (x <= a || x >= c) return 0.0;
         if (x == b) return 1.0;
+        // Rising slope
         if (x > a && x < b) return (x - a) / (b - a);
+        // Falling slope
         if (x > b && x < c) return (c - x) / (c - b);
         return 0.0;
     }
@@ -23,8 +25,11 @@ namespace FDSHA {
 
     double TrapezoidalFuzzySet::getMembershipDegree(double x) const {
         if (x <= a || x >= d) return 0.0;
+        // Peak (membership = 1.0)
         if (x >= b && x <= c) return 1.0;
+        // Rising slope
         if (x > a && x < b) return (x - a) / (b - a);
+        // Falling slope
         if (x > c && x < d) return (d - x) / (d - c);
         return 0.0;
     }

@@ -9,6 +9,10 @@
 #include <string>
 
 namespace FDSHA {
+
+    /**
+     * @brief Engine class to perform the Mamdani Fuzzy Inference for FDSHA.
+     */
     class FDSHAEngine {
     private:
         // Maps to hold fuzzy sets
@@ -35,6 +39,9 @@ namespace FDSHA {
         FDSHAEngine();
         ~FDSHAEngine();
 
+        /**
+         * @brief Runs the fuzzy inference process to find the crisp PGA.
+         */
         double findPGA(double mmaxInput, double rInput, double fInput);
     };
 
