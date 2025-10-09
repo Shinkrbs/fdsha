@@ -32,7 +32,27 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="main.cpp" />
+		<Unit filename="Enums.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="FDSHAEngine.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="FDSHAEngine.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="FuzzyRule.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="FuzzySet.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="FuzzySet.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="main.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

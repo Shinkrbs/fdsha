@@ -8,11 +8,14 @@ int main() {
     FDSHAEngine engine;
 
     // Scenario: A major earthquake close to the site on a high-stress fault.
-    // Mmax: Large (7.2), R: Near (15 km), F: Thrust (0.08)
+    // Mmax (Maximum Magnitude): Large (7.2)
+    // R (Source-to-Site Distance): Near (15 km)
+    // F (Fault Type Index): Thrust (0.08)
     double Mmax_Input = 7.2;
     double R_Input = 15.0;
     double F_Input = 0.08;
 
+    // Run the fuzzy inference system
     double PGA_Output = engine.findPGA(Mmax_Input, R_Input, F_Input);
 
     std::cout << "\n--- Seismic Hazard Analysis Results ---" << std::endl;
